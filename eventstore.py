@@ -73,7 +73,10 @@ class RedisEventStore(EventStore):
             "event_id": event_id,
             "message": str(message)
         }
-        await self.redis.rpush(event_key, str(event_data),ttl=60*30) #ttl of half hour
+        # Check if key exists before setting TTL
+        key_exists = await self.redis.exists(event_key)
+        await self.redis.rpush(event_key, str(event_data))
+        await self.redis.expire(event_key, 60*30)  # TTL of half hour
         await self.redis.ltrim(event_key, -self.max_events_per_stream, -1)
         return event_id
     
