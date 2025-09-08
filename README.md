@@ -47,7 +47,7 @@ To use MCP Clients such as Claude Desktop with the MCP server use the config for
 # Reliability
 Each message in SSE stream is marked with a unique event id and all request-response interaction is represented with a unique session id. A response's event id and session id is stored in a event store such as:
 - [x] InMemoryEventStore()
-- [x] MongoDBEventStore()
+- [x] RedisEventStore()
 
 # Acknowledgements
 The project uses the low level streamable http example to create the structure of the mcp server using the streamable http. The example is from the [Python SDK](https://github.com/modelcontextprotocol/python-sdk).
