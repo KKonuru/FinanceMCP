@@ -1,7 +1,7 @@
 import yfinance as yf
 import mcp.types as types
 import pandas as pd
-
+from mcp.server.lowlevel import Server
 tools = [
     types.Tool(
                 name="get-stock-price-data",
@@ -138,10 +138,10 @@ tools = [
             }
         )
 ]
-async def tool_call_router(name: str,args:dict) -> list[types.ContentBlock]:
+async def tool_call_router(name: str,args:dict,app:Server) -> list[types.ContentBlock]:
     for tool in tools:
         if tool.name == name:
-            return await globals()[tool.name.replace("-", "_")](None, args)
+            return await globals()[tool.name.replace("-", "_")](app, args)
     raise ValueError(f"Tool {name} not found")
 
 async def get_stock_price_data(app,args: dict) -> list[types.ContentBlock]:
@@ -193,7 +193,7 @@ async def get_stock_price_data(app,args: dict) -> list[types.ContentBlock]:
         )
         return [types.TextContent(type="text", text=error_msg)]
     
-async def get_stock_price_period(app,args:dict) -> list[type.ContentBlock]:
+async def get_stock_price_period(app,args:dict) -> list[types.ContentBlock]:
     """Fetches the stock price for a given ticker and timeframe.
     Args:
         args (dict): Dictionary containing 'ticker' and 'timeframe'.
@@ -263,7 +263,6 @@ async def get_options_dates(app, args: dict) -> list[types.ContentBlock]:
             logger="options_dates_fetcher",
             related_request_id=ctx.request_id,
         )
-        
         return [types.TextContent(type="text", text=response_msg)]
     
     except Exception as e:

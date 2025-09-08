@@ -4,6 +4,7 @@ import pandas as pd
 from ta.momentum import RSIIndicator
 from ta.volatility import BollingerBands
 from ta.trend import MACD
+from mcp.server.lowlevel import Server
 tools = [
     types.Tool(
             name="calculate-all-volatility",
@@ -109,10 +110,10 @@ tools = [
             }
     )
 ]
-async def tool_call_router(name: str, args: dict) -> list[types.ContentBlock]:
+async def tool_call_router(name: str, args: dict,app: Server) -> list[types.ContentBlock]:
     for tool in tools:
         if tool.name == name:
-            return await globals()[tool.name.replace("-", "_")](None, args)
+            return await globals()[tool.name.replace("-", "_")](app, args)
     raise ValueError(f"Tool {name} not found")
 async def calculate_all_volatility(app, args:dict) -> list[types.ContentBlock]:
     """Calculates the standard deviation of returns for a given stock symbol over multiple periods.
@@ -169,7 +170,7 @@ async def calculate_all_volatility(app, args:dict) -> list[types.ContentBlock]:
     
     return [types.TextContent(type="text",text=response_msg)]
 
-async def get_technical_indicators(app, args:dict) -> list[type.ContentBlock]:
+async def get_technical_indicators(app, args:dict) -> list[types.ContentBlock]:
     """
     Fetches technical indicators for a given stock symbol.
     Args:
@@ -182,7 +183,8 @@ async def get_technical_indicators(app, args:dict) -> list[type.ContentBlock]:
     ctx = app.request_context
     symbol = args.get("symbol", "").upper()
     indicators = args.get("indicators", ["RSI", "MACD", "BB"])
-
+    if indicators is None or not isinstance(indicators, list) or len(indicators) == 0:
+        indicators = ["RSI", "MACD", "BB"]
     if not symbol:
         return [types.ContentBlock(text="Please provide a valid stock symbol.")]
 
