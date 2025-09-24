@@ -1,3 +1,10 @@
+# Model context protocol
+This repository contains a implementation using low level server of the Model Context Protocol (MCP) to create a server that provides market data, market analysis, options analysis, trading strategy tools, and prediction tools.
+
+The server uses yfinance to get market data and perform analysis. The streamable HTTP transport is used as it is can handle streaming data and supports both stateless and stateful modes, flexibility, and reliability. Compared to the Server Sent Events (SSE) transport, streamable HTTP performs all communication through one endpoint /sse. It also uses a session id mechanism to track request-response interactions. I implemented a Redis based memory store to store the event ids and session ids for reliability.
+
+
+# Usage
 To use MCP Clients such as Claude Desktop with the MCP server use the config format:
 {
   "mcpServers": {
@@ -18,8 +25,6 @@ To use MCP Clients such as Claude Desktop with the MCP server use the config for
 - [x] get_options_chain(ticker,options_type,expiration_date, number_strikes)
 - [x] get_dividend_history(symbol, years_back=5)
 - [x] get_earnings_calendar(symbol)
-- [ ] get_market_sentiment(symbol)
-- [ ] screen_equity()
 ## Market Analysis Tools
 - [x] calculate_all_volatility(symbol, period=30)
 - [x] get_technical_indicators(symbol, indicators=["RSI", "MACD", "BB"])

@@ -1,4 +1,3 @@
-import asyncio
 from collections.abc import AsyncIterator
 import contextlib
 from mcp.server.lowlevel import Server
@@ -10,7 +9,6 @@ from pydantic import AnyUrl
 from starlette.types import Receive, Scope, Send
 from eventstore import InMemoryEventStore, RedisEventStore
 import uvicorn
-import os
 from dotenv import load_dotenv
 from Tools import market_data_tools,market_data_router,market_analysis_router,market_analysis_tools
 # from options_analysis import tools as options_tools  # Commented out as the module is unresolved
@@ -57,7 +55,6 @@ async def lifespan(app: Starlette) -> AsyncIterator[None]:
         try:
             yield
         finally:
-            event_store.debugger()  # Debugging function to see stored events
             print("Lifespan shutdown")
 
 starlette_app = Starlette(
@@ -71,7 +68,5 @@ starlette_app = Starlette(
 
 
 if __name__ == "__main__":
-    host = str(os.getenv("URL"))
-    port = int(os.getenv("PORT"))
-    uvicorn.run(starlette_app,host=host,port=port)
+    uvicorn.run(starlette_app)
     
